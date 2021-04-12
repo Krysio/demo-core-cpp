@@ -3,7 +3,7 @@
 namespace helper {
     constexpr char hexmap[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-    std::string readBuffToHexStr(unsigned char* data, size_t len)
+    std::string readBuffToHexStr(buffer_ptr data, size_t len)
     {
         std::string s(len * 2, ' ');
         for (size_t i = 0; i < len; ++i) {
@@ -13,10 +13,10 @@ namespace helper {
         return s;
     }
 }
-namespace leb128 {
+namespace LEB128 {
     const uintmax_t uintmax_t_bits = sizeof(uintmax_t) * CHAR_BIT;
 
-    uintmax_t calcSizeOfUleb128(
+    uintmax_t calcSizeOfUnsigned(
         uintmax_t value
     ) {
         uintmax_t countOfBytes = 0;
@@ -29,7 +29,7 @@ namespace leb128 {
         return countOfBytes;
     }
 
-    uintmax_t calcSizeOfLeb128(
+    uintmax_t calcSizeOfSigned(
         intmax_t value
     ) {
         uintmax_t countOfBytes = 0;
@@ -46,8 +46,8 @@ namespace leb128 {
         return countOfBytes;
     }
 
-    uintmax_t writeUleb128(
-        unsigned char* bufferAddress,
+    uintmax_t writeUnsigned(
+        buffer_ptr bufferAddress,
         uintmax_t value
     ) {
         uintmax_t countOfBytes = 0;
@@ -55,7 +55,7 @@ namespace leb128 {
 
         do {
             unsigned char byte = value & 0x7f;
-            unsigned char* byteAddress = reinterpret_cast<unsigned char*>(bufferAddress);
+            buffer_ptr byteAddress = reinterpret_cast<buffer_ptr>(bufferAddress);
 
             value >>= 7;
 
@@ -71,8 +71,8 @@ namespace leb128 {
         return countOfBytes;
     }
 
-    uintmax_t readUleb128(
-        unsigned const char* bufferAddress,
+    uintmax_t readUnsigned(
+        buffer_cptr bufferAddress,
         uintmax_t* returnAddress
     ) {
         uintmax_t result = 0;
@@ -80,7 +80,7 @@ namespace leb128 {
         uintmax_t countOfReadBytes = 0;
 
         while (1) {
-            unsigned char byte = *reinterpret_cast<const unsigned char*>(bufferAddress++);
+            unsigned char byte = *reinterpret_cast<buffer_cptr>(bufferAddress++);
             
             countOfReadBytes++;
             result |= (byte & static_cast<uintmax_t>(0x7f)) << shift;
@@ -95,8 +95,8 @@ namespace leb128 {
         return countOfReadBytes;
     }
 
-    uintmax_t writeLeb128(
-        unsigned char* bufferAddress,
+    uintmax_t writeSigned(
+        buffer_ptr bufferAddress,
         intmax_t value
     ) {
         size_t countOfBytes = 0;
@@ -104,7 +104,7 @@ namespace leb128 {
 
         do {
             unsigned char byte = value & 0x7f;
-            unsigned char* byteAddress = reinterpret_cast<unsigned char*>(bufferAddress);
+            buffer_ptr byteAddress = reinterpret_cast<buffer_ptr>(bufferAddress);
 
             value >>= 7;
 
@@ -130,8 +130,8 @@ namespace leb128 {
         return countOfBytes;
     }
 
-    uintmax_t readLeb128(
-        unsigned const char* bufferAddress,
+    uintmax_t readSigned(
+        buffer_cptr bufferAddress,
         intmax_t* returnAddress
     ) {
         unsigned char byte;
@@ -141,7 +141,7 @@ namespace leb128 {
         intmax_t more;
 
         do {
-            byte = *reinterpret_cast<const unsigned char*>(bufferAddress++);
+            byte = *reinterpret_cast<buffer_cptr>(bufferAddress++);
 
             countOfReadBytes++;
             result |= (byte & static_cast<uintmax_t>(0x7f)) << shift;

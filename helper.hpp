@@ -3,13 +3,13 @@
 namespace helper {
     std::string readBuffToHexStr(unsigned char* data, size_t len);
 }
-namespace leb128 {
+namespace LEB128 {
     /**
      * Calculate size encoded unsigned LEB128 data
      * @param value: value to encode
      * @return the number of bytes to allocate
      */
-    uintmax_t calcSizeOfUleb128(
+    uintmax_t calcSizeOfUnsigned(
         uintmax_t value
     );
     /**
@@ -17,7 +17,7 @@ namespace leb128 {
      * @param value: value to encode
      * @return the number of bytes to allocate
      */
-    uintmax_t calcSizeOfLeb128(
+    uintmax_t calcSizeOfSigned(
         intmax_t value
     );
     /**
@@ -26,8 +26,8 @@ namespace leb128 {
      * @param value: value to encode
      * @return the number of written bytes
      */
-    uintmax_t writeUleb128(
-        unsigned char* bufferAddress,
+    uintmax_t writeUnsigned(
+        buffer_ptr bufferAddress,
         uintmax_t value
     );
     /**
@@ -36,8 +36,8 @@ namespace leb128 {
      * @param returnAddress: address to store the result
      * @return the number of bytes read
      */
-    uintmax_t readUleb128(
-        unsigned const char* bufferAddress,
+    uintmax_t readUnsigned(
+        buffer_cptr bufferAddress,
         uintmax_t* returnAddress
     );
     /**
@@ -46,8 +46,8 @@ namespace leb128 {
      * @param value: value to encode
      * @return the number of written bytes
      */
-    uintmax_t writeLeb128(
-        unsigned char* bufferAddress,
+    uintmax_t writeSigned(
+        buffer_ptr bufferAddress,
         intmax_t value
     );
     /**
@@ -56,8 +56,8 @@ namespace leb128 {
      * @param returnAddress: address to store the result
      * @return the number of bytes read
      */
-    uintmax_t readLeb128(
-        unsigned const char* bufferAddress,
+    uintmax_t readSigned(
+        buffer_cptr bufferAddress,
         intmax_t* returnAddress
     );
 }
