@@ -19,7 +19,7 @@ namespace Txn {
 
 	mapOfTypeApi typeMap = {};
 
-	inline bool
+	bool
 	typeExist(uintmax_t type) {
 		return typeMap.find(type) != Txn::typeMap.end();
 	}

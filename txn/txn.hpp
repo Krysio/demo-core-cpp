@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../main.h";
+#include "../main.h"
 
 namespace Txn {
 	class DataWrapper {
@@ -23,7 +23,7 @@ namespace Txn {
 
 	/******************************/
 
-	inline bool
+	bool
 	typeExist(uintmax_t type);
 
 	TypeApi*

@@ -1,7 +1,5 @@
 ﻿#include "main.h"
 
-using namespace std;
-
 class TxnData {
 protected:
 	unsigned const char* buffer;
@@ -28,11 +26,11 @@ public:
 };
 
 class ExternalTxn {
-	unsigned const char* buffer;
+	unsigned char* buffer;
 	uintmax_t version;
 	uintmax_t type;
 	bool valid;
-	TxnData* data;
+	Txn::DataWrapper* data;
 public:
 	ExternalTxn(unsigned char* buffer) {
 		this->valid = false;
@@ -40,16 +38,20 @@ public:
 		this->buffer = buffer;
 
 		uintmax_t shift = 0;
+		// read field: version
 		shift+= LEB128::readUnsigned(buffer + shift, &this->version);
+		// read field: txn type
 		shift+= LEB128::readUnsigned(buffer + shift, &this->type);
 
-		if (mapOfTypes.find(this->type) != mapOfTypes.end()) {
-			this->data = mapOfTypes.at(this->type)(buffer + shift);
+		if (Txn::typeExist(this->type) == true) {
+			Txn::TypeApi* $txnApi = Txn::getTypeApi(this->type);
+
+			this->data = $txnApi->createDataWrapper(this->buffer);
 			this->data->readBuffer();
 			this->valid = true;
-		}
 
-		std::cout << this->version << " & " << this->type << " " << this->data->toString() << "\n";
+			std::cout << this->version << " & " << this->type << " " << this->data->toString() << "\n";
+		}
 	}
 	~ExternalTxn() {
 		delete this->data;
@@ -60,7 +62,7 @@ int main()
 {
 	Txn::init();
 
-	cout << "Hello CMake." << endl;
+	std::cout << "Hello CMake." << std::endl;
 
 	// test write uleb128 1607549357699 -> 839da2cbe42e;
 	{
@@ -70,7 +72,7 @@ int main()
 		uintmax_t bytesToAllocate = LEB128::calcSizeOfUnsigned(value);
 		unsigned char* buffer = new unsigned char[bytesToAllocate];
 		uintmax_t count = LEB128::writeUnsigned(buffer, value);
-		string hex = helper::readBuffToHexStr(buffer, count);
+		std::string hex = helper::readBuffToHexStr(buffer, count);
 
 		fprintf(stderr, "%llu - %llu\n", bytesToAllocate, count);
 		fprintf(stderr, "%s\n", hex.c_str());
@@ -96,7 +98,7 @@ int main()
 		uintmax_t bytesToAllocate = LEB128::calcSizeOfSigned(value);
 		unsigned char* buffer = new unsigned char[bytesToAllocate];
 		uintmax_t count = LEB128::writeSigned(buffer, value);
-		string hex = helper::readBuffToHexStr(buffer, count);
+		std::string hex = helper::readBuffToHexStr(buffer, count);
 
 		fprintf(stderr, "%llu - %llu\n", bytesToAllocate, count);
 		fprintf(stderr, "%s\n", hex.c_str());
@@ -109,7 +111,7 @@ int main()
 		fprintf(stderr, "\nRead SLEB128\n");
 
 		unsigned char buffer[] = { 0xc0, 0xc4, 0x07 };
-		string hex = helper::readBuffToHexStr(buffer, 3);
+		std::string hex = helper::readBuffToHexStr(buffer, 3);
 		intmax_t expectedResult = 123456;
 		fprintf(stderr, "%s -> %lli\n", hex.c_str(), expectedResult);
 
@@ -119,15 +121,7 @@ int main()
 	}
 
 	{
-		mapOfTypes = {};
-		mapOfTypes.insert({
-			0x12,
-			[](unsigned char* buffer) -> TxnData* {
-				return new TxnDataUserId(buffer);
-			}
-		});
-
-		unsigned char buffer[] = { 0x01, 0x12, 0x27 };
+		unsigned char buffer[] = { 0x01, 0x55, 0x27 };
 		ExternalTxn test(buffer);
 	}
 

@@ -9,4 +9,4 @@ typedef unsigned const char* buffer_cptr;
 
 #include "helper.hpp"
 #include "txn/txn.hpp"
-#include "txn/typeRemoveUser.hpp";
+#include "txn/typeRemoveUser.hpp"
